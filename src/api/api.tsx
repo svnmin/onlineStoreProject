@@ -1,8 +1,9 @@
 
 
 
+import { adminUser } from "@/service/admin";
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, updateProfile } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
@@ -47,18 +48,38 @@ export async function googleLogout(){
     }
 }
 
-//로그인 정보 유지(새로고침해도 로그인 유지)
+// 로그인 정보 유지(새로고침해도 로그인 유지)
 
-// export function onUserState(callback){
-//     onAuthStateChanged(auth,async(user) => {
-//         if(user){
-//             try{
-//                 callback()
-//             }catch(error){
-//                 console.error(error)
-//             }
-//         }
-//     })
-// }
+export function onUserState(callback : (user : any) => void):() => void {
+    onAuthStateChanged(auth,async(user) => {
+        //onAuthStateChanged = 사용자 인증 상태 변화를 체크하는 파이어베이스 훅
+        if(user){
+            try{
+                const updateUser = await adminUser(user);
+                callback(updateUser)
+            }catch(error){
+                console.error(error);
+                callback(user);
+            }
+        }else{
+            callback(null);
+        }
+    })
+}
+//신규회원 
+export async function JoinEmail(email : string, password : string, name : string) {
+    const auth = getAuth();
+    try{
+        const userData = await createUserWithEmailAndPassword(auth, email, password)
+        const user = userData.user;
+        await updateProfile(user,{
+            displayName : name
+        })
+        await signOut(auth)
+        return {success : true}
+    }catch(error){
+        console.error(error)
+    }
+}
 
 export {database};
