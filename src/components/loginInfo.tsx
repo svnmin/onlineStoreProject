@@ -50,7 +50,7 @@ const LoginInfo : FC = () => {
     return(
         <Container>
             {user?.isAdmin &&(
-                <AdminLink href='./upload' className="px-3 py-1 border-blue-500 text-blue-500 rounded">
+                <AdminLink href='/upload'>
                     업로드
                 </AdminLink>
             )}
@@ -81,7 +81,7 @@ const AdminLink = styled(Link)`
     */
     padding: 10px 20px;
     border: solid 1px #bbbbbb;
-    color: 56b3ff;
+    color: #56b3ff;
     border-radius: 2px;
     text-decoration: none;
     transition: 300ms;

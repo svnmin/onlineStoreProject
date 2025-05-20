@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FC } from "react";
 import LoginInfo from "./loginInfo";
 import styled from "styled-components";
+import Gnb from "./gnb";
 
 
 const Header : FC = () => {
@@ -12,6 +13,7 @@ const Header : FC = () => {
             <Logo>
                 <Link href="/">store</Link>
             </Logo>
+            <Gnb/>
             <LoginInfo/>
         </HeaderContainer>
     )
