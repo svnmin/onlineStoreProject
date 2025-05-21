@@ -15,6 +15,7 @@ const Header : FC = () => {
             </Logo>
             <Gnb/>
             <LoginInfo/>
+            <Link href="/cart">카트</Link>
         </HeaderContainer>
     )
 }

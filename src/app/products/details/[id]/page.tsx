@@ -2,6 +2,7 @@
 
 import { getProducts, googleLogin, Product } from "@/api/api";
 import { useAuthContext } from "@/context/authContext";
+import useCart from "@/service/useCart";
 import { FormatCurrency } from "@/utility/formatCurrency";
 import { useParams } from "next/navigation";
 import { title } from "process";
@@ -12,11 +13,13 @@ import styled from "styled-components";
 const ProductDetailPage : FC = () => {
     
     const {id} = useParams() as { id? : string}
-    const {user} = useAuthContext()
-    console.log(user)
-    const [product, setProduct] = useState<Product | null>(null)
+    const {user} = useAuthContext();
+    // console.log(user)
+    const {addItemCart} = useCart();
+
+    const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null)
+    const [error, setError] = useState<string | null>(null);
 
     const [selected, setSelected] = useState<string>('');
     const [selectedColor, setSelectedColor] = useState<string>('');
@@ -67,6 +70,16 @@ const ProductDetailPage : FC = () => {
             color : selectedColor,
             quantity : 1,
         }
+        addItemCart.mutate(productToAdd,{
+            onSuccess : () => {
+                alert('장바구니에 추가되었습니다.')
+            },
+            onError : (error) => {
+                alert('장바구니 추가에 실패했습니다.')
+                console.error(error);
+            }
+        })
+
     }
 
     return(

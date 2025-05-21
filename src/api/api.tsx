@@ -2,9 +2,10 @@
 
 
 import { adminUser } from "@/service/admin";
+import { CartItem } from "@/types/type";
 import { initializeApp } from "firebase/app";
 import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, updateProfile } from "firebase/auth";
-import { getDatabase, set, ref as databaseRef, ref, query, orderByChild, equalTo, get, DataSnapshot } from "firebase/database";
+import { getDatabase, set, ref as databaseRef, ref, query, orderByChild, equalTo, get, DataSnapshot, remove } from "firebase/database";
 import { v4 as uuid } from "uuid";
 
 const firebaseConfig = {
@@ -60,7 +61,6 @@ export async function googleLogout(){
 }
 
 // 로그인 정보 유지(새로고침해도 로그인 유지)
-
 export function onUserState(callback : (user : any) => void):() => void {
     onAuthStateChanged(auth,async(user) => {
         //onAuthStateChanged = 사용자 인증 상태 변화를 체크하는 파이어베이스 훅
@@ -142,5 +142,46 @@ export async function getProducts( id : string) : Promise<Product[]>{
         return []
     }
 }
+//카트 내용
+export async function getCart(userId : string) : Promise<CartItem[]>{
+    if(!userId){
+        throw new Error('유효하지 않은 사용자입니다.')
+    }
+    try{
+        const snapshot : DataSnapshot = await get(ref(database,`cart/${userId}`))
+        if(!snapshot.exists()) return []
+        const items = snapshot.val() as Record<string, CartItem>;
+        return Object.values(items);
+    }catch(error){
+        console.error(error);
+    }
+}
 
-export {database};
+export async function updateCart(userId : string, product : CartItem) : Promise<void> {
+    if(!userId){
+        throw new Error('유효하지 않은 사용자입니다')
+    }if(!product?.id){
+        throw new Error('유효하지 않은 상품입니다')
+    }
+    try{
+        const cartRef = ref(database, `cart/${userId}/${product.id}`)
+        await set(cartRef,product)
+    }catch(error){
+        console.error(error);        
+    }
+}
+export async function removeCart(userId : string, productId : string) : Promise<void> {
+    if(!userId){
+        throw new Error('유효하지 않은 사용자입니다')
+    }if(!productId){
+        throw new Error('유효하지 않은 상품입니다')
+    }
+    try{
+        const cartItemRef = ref(database, `cart/${userId}/${productId}`)
+        await remove(cartItemRef);
+    }catch(error){
+        console.error(error);
+    }
+}
+
+export { database };
