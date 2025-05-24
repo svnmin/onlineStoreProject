@@ -6,6 +6,7 @@ import { useParams, usePathname } from "next/navigation"
 import { FC, useEffect, useState } from "react";
 import styled from "styled-components";
 import NoProduct from "./noProduct";
+import CategorySlider from "@/components/categorySlider";
 
 
 const  CategoryPage : FC = () => {
@@ -14,6 +15,8 @@ const  CategoryPage : FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+
+    const [randomImgs, setRandomImgs] = useState<string[]>([]);
 
     useEffect(() => {
         if(!slug){
@@ -29,9 +32,19 @@ const  CategoryPage : FC = () => {
 
     },[slug])
 
+    //랜덤 이미지 선택
+    useEffect(() => {
+        if(products.length === 0) return
+        const randomImgs = [...products].sort(() => 0.5 - Math.random())
+        const imgs = randomImgs.slice(0,3).map((p) => p.image ?? '');
+        setRandomImgs(imgs);
+
+    },[products])
+
     return(
         <Container>
             <Title>{slug} page</Title>
+            {randomImgs.length > 0 && <CategorySlider imgs={randomImgs}/>}
             {products.length > 0 ? (
                 <CategoryProductList slug={slug} products={products}/>
             ) : (

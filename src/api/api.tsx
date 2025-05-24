@@ -1,6 +1,5 @@
 
 
-
 import { adminUser } from "@/service/admin";
 import { CartItem } from "@/types/type";
 import { initializeApp } from "firebase/app";
@@ -59,7 +58,6 @@ export async function googleLogout(){
         console.error(error)
     }
 }
-
 // 로그인 정보 유지(새로고침해도 로그인 유지)
 export function onUserState(callback : (user : any) => void):() => void {
     onAuthStateChanged(auth,async(user) => {
@@ -111,7 +109,6 @@ export async function addProducts(
     }
     
 }
-
 export async function getCategoryProduct(category : string):Promise<Product[]>{
     try{
         const productRef = ref(database,'products');
@@ -127,7 +124,6 @@ export async function getCategoryProduct(category : string):Promise<Product[]>{
         return []
     }
 }
-
 export async function getProducts( id : string) : Promise<Product[]>{
     try{
         // const snapshot : DataSnapshot = await get(ref(database , `products/${id}`));
@@ -156,7 +152,6 @@ export async function getCart(userId : string) : Promise<CartItem[]>{
         console.error(error);
     }
 }
-
 export async function updateCart(userId : string, product : CartItem) : Promise<void> {
     if(!userId){
         throw new Error('유효하지 않은 사용자입니다')
@@ -181,6 +176,34 @@ export async function removeCart(userId : string, productId : string) : Promise<
         await remove(cartItemRef);
     }catch(error){
         console.error(error);
+    }
+}
+export async function getAllProducts() : Promise<Product[]> {
+    try{
+        const snapshot : DataSnapshot = await get(ref(database, 'products'));
+        if(!snapshot.exists()) return [];
+        const data = snapshot.val() as Recode<string, Product>;
+        return Object.values(data)
+    }catch(error){
+        console.log(error)
+        return [];
+    }
+    
+}
+export async function getCategoryAllProducts(category : string) : Promise<Product[]> {
+    try{
+        const productRef = ref(database,'products')
+        const q = query(productRef, orderByChild('category'), equalTo(category))
+        const snapshot : DataSnapshot = await get(q);
+
+        if(!snapshot.exists()){
+            return []
+        }
+        const data = snapshot.val() as Recode<string, Product>
+        return Object.values(data)
+    }catch(error){
+        console.error(error);
+        return [];
     }
 }
 

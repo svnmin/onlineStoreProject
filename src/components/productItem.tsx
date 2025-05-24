@@ -52,6 +52,10 @@ const ItemCard = styled.div`
 const ImgWrap = styled.div`
     position: relative;
     width: 100%;
+    img{
+        width: 100%;
+        display: block;
+    }
 `
 const Content = styled.div`
     padding: 12px;
